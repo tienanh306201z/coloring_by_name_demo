@@ -119,7 +119,6 @@ class _ColoringSvgScreenState extends State<ColoringSvgScreen> {
                 boundaryMargin: const EdgeInsets.all(100),
                 minScale: 0.7,
                 maxScale: 4.0,
-                constrained: true,
                 clipBehavior: Clip.none,
                 onInteractionStart: (_) => _onInteractionStart(context),
                 onInteractionEnd: (_) => _onInteractionEnd(),
@@ -203,7 +202,6 @@ class _ColoringSvgScreenState extends State<ColoringSvgScreen> {
   Widget _buildSelectColorList() {
     return Container(
       height: 100,
-      color: Theme.of(context).colorScheme.surface,
       child: ValueListenableBuilder(
         valueListenable: _availableColors,
         builder: (context, value, __) => ListView.builder(
