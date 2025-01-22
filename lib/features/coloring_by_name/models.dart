@@ -14,9 +14,9 @@ class VectorImage {
 @CopyWith()
 class PathSvgItem {
   final Path path;
-  final Color? currentColor;
-  final Color? targetColor;
-  final bool isColored;
+  Color? currentColor;
+  Color? targetColor;
+  bool isColored;
 
   PathSvgItem({required this.path, this.currentColor, this.targetColor, this.isColored = false});
 }

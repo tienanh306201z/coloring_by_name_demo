@@ -1,4 +1,4 @@
-import 'package:base_flutter/features/coloring_by_name/coloring_svg_screen.dart';
+import 'features/coloring_by_name/coloring_svg_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {

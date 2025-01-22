@@ -1,12 +1,14 @@
+import 'dart:async';
 import 'dart:ui' as ui;
 
-import 'package:base_flutter/features/coloring_by_name/models.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_drawing/path_drawing.dart';
 import 'package:xml/xml.dart';
+
+import 'models.dart';
 
 Future<String> _fetchSvgData(String source) async {
   if (source.startsWith('http')) {
@@ -98,6 +100,16 @@ Future<ui.Image> generateCheckerboardImage() async {
   final image = await picture.toImage((tileSize * 2).toInt(), (tileSize * 2).toInt());
 
   return image;
+}
+
+/// Loads the pencil texture as a [ui.Image]
+Future<ui.Image> loadTextureImage() async {
+  final imageStream = const AssetImage('assets/pencil_texture.png').resolve(const ImageConfiguration());
+  final completer = Completer<ui.Image>();
+  imageStream.addListener(ImageStreamListener((ImageInfo info, bool _) {
+    completer.complete(info.image);
+  }));
+  return completer.future;
 }
 
 bool isBlackColor(Color color) {
