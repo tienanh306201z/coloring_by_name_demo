@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 import 'package:base_flutter/features/coloring_by_name/checker_board.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_svg/svg.dart';
 
 import 'models.dart';
 import 'svg_painter.dart';
@@ -69,22 +70,22 @@ class _ColoringSvgScreenState extends State<ColoringSvgScreen> {
   }
 
   void _capturePainting() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final capturedPicture = (_paintKey.currentContext!.findRenderObject()! as RenderRepaintBoundary).toImageSync(pixelRatio: context.devicePixelRatio * 2);
-      _interactionNotifier.value.image?.dispose();
-      _interactionNotifier.value = _interactionNotifier.value.copyWith(image: capturedPicture);
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   final capturedPicture = (_paintKey.currentContext!.findRenderObject()! as RenderRepaintBoundary).toImageSync(pixelRatio: context.devicePixelRatio * 2);
+    //   _interactionNotifier.value.image?.dispose();
+    //   _interactionNotifier.value = _interactionNotifier.value.copyWith(image: capturedPicture);
+    // });
   }
 
   void _onTap(int index) {
-    final notifier = _pathItemsNotifier[index];
-    if (_interactionNotifier.value.isInteracting || notifier.value.targetColor != _selectedColorNotifier.value || notifier.value.isColored) return;
+    // final notifier = _pathItemsNotifier[index];
+    // if (_interactionNotifier.value.isInteracting || notifier.value.targetColor != _selectedColorNotifier.value || notifier.value.isColored) return;
 
-    notifier.value = notifier.value.copyWith(currentColor: notifier.value.targetColor, isColored: true);
-    if (_pathItemsNotifier.where((item) => item.value.targetColor == notifier.value.targetColor).every((item) => item.value.isColored)) {
-      _availableColors.value = _availableColors.value.where((color) => color != notifier.value.targetColor).toList();
-    }
-    _capturePainting();
+    // notifier.value = notifier.value.copyWith(currentColor: notifier.value.targetColor, isColored: true);
+    // if (_pathItemsNotifier.where((item) => item.value.targetColor == notifier.value.targetColor).every((item) => item.value.isColored)) {
+    //   _availableColors.value = _availableColors.value.where((color) => color != notifier.value.targetColor).toList();
+    // }
+    // _capturePainting();
   }
 
   void _onSelectColor(Color color) {
@@ -96,9 +97,9 @@ class _ColoringSvgScreenState extends State<ColoringSvgScreen> {
 
       if (currentColor != Colors.transparent && targetColor == color && !notifier.value.isColored) {
         notifier.value = notifier.value.copyWith(currentColor: Colors.transparent);
-      } else if (currentColor == Colors.transparent) {
+      } /* else if (currentColor == Colors.transparent) {
         notifier.value = notifier.value.copyWith(currentColor: Colors.white);
-      }
+      } */
     }
     _capturePainting();
   }
@@ -129,6 +130,8 @@ class _ColoringSvgScreenState extends State<ColoringSvgScreen> {
                 boundaryMargin: const EdgeInsets.all(100),
                 minScale: 0.7,
                 maxScale: 4.0,
+                constrained: true,
+                clipBehavior: Clip.none,
                 onInteractionStart: (_) => _onInteractionStart(context),
                 onInteractionEnd: (_) => _onInteractionEnd(),
                 child: Center(
@@ -139,48 +142,54 @@ class _ColoringSvgScreenState extends State<ColoringSvgScreen> {
                           child: SizedBox(
                             height: _originalSvgSize!.height,
                             width: _originalSvgSize!.width,
-                            child: CheckerboardSvg(svgAssetPath: _svgImage, checkerboardImage: _checkerboardImage),
-                          ),
-                        ),
-                      ),
-                      ValueListenableBuilder(
-                        valueListenable: _interactionNotifier,
-                        builder: (context, value, __) => Visibility(
-                          visible: value.isInteracting && value.image != null,
-                          child: FittedBox(
-                            child: value.image != null ? MockSvgImage(image: value.image!, size: _originalSvgSize!) : Container(),
-                          ),
-                        ),
-                      ),
-                      ValueListenableBuilder(
-                        valueListenable: _interactionNotifier,
-                        builder: (context, value, __) => Visibility.maintain(
-                          visible: !value.isInteracting,
-                          child: FittedBox(
-                            child: RepaintBoundary(
-                              key: _paintKey,
-                              child: SizedBox(
-                                width: _originalSvgSize!.width,
-                                height: _originalSvgSize!.height,
-                                child: Stack(
-                                  children: _pathItemsNotifier
-                                      .asMap()
-                                      .entries
-                                      .map(
-                                        (entry) => ValueListenableBuilder(
-                                          valueListenable: entry.value,
-                                          builder: (context, value, __) => _buildSvgPathImageItem(
-                                            context: context,
-                                            item: entry.value.value,
-                                            size: _originalSvgSize!,
-                                            onTap: () => _onTap(entry.key),
-                                          ),
-                                        ),
-                                      )
-                                      .toList(),
-                                ),
-                              ),
+                            child: SvgPicture.asset(
+                              _svgImage,
+                              fit: BoxFit.contain,
                             ),
+                          ),
+                        ),
+                      ),
+                      // ValueListenableBuilder(
+                      //   valueListenable: _interactionNotifier,
+                      //   builder: (context, value, __) => Visibility(
+                      //     visible: value.isInteracting && value.image != null,
+                      //     child: FittedBox(
+                      //       child: value.image != null ? MockSvgImage(image: value.image!, size: _originalSvgSize!) : Container(),
+                      //     ),
+                      //   ),
+                      // ),
+                      // ValueListenableBuilder(
+                      //   valueListenable: _interactionNotifier,
+                      //   builder: (context, value, __) => Visibility.maintain(
+                      //     visible: !value.isInteracting,
+                      //     child:
+                      FittedBox(
+                        child: RepaintBoundary(
+                          key: _paintKey,
+                          child: SizedBox(
+                            width: _originalSvgSize!.width,
+                            height: _originalSvgSize!.height,
+                            child: Stack(
+                              children: _pathItemsNotifier
+                                  .asMap()
+                                  .entries
+                                  .map(
+                                    (entry) => ValueListenableBuilder(
+                                      valueListenable: entry.value,
+                                      builder: (context, value, __) => value.currentColor == Colors.transparent
+                                          ? Container()
+                                          : _buildSvgPathImageItem(
+                                              context: context,
+                                              item: value,
+                                              size: _originalSvgSize!,
+                                              onTap: () => _onTap(entry.key),
+                                            ),
+                                    ),
+                                  )
+                                  .toList(),
+                            ),
+                            //   ),
+                            // ),
                           ),
                         ),
                       ),
